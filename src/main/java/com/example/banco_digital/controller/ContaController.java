@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class ContaController {
     private final ContaService contaService;
 
-    @PostMapping
+    @PostMapping("/criarConta")
     public ResponseEntity<Conta> criarConta(@RequestBody Conta conta) {
         return ResponseEntity.ok(contaService.criarConta(conta));
     }
