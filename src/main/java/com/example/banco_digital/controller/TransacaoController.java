@@ -25,7 +25,7 @@ public class TransacaoController {
             @RequestParam BigDecimal valor) {
         return ResponseEntity.ok(transacaoService.depositar(numeroConta, agencia, valor));
     }
-    
+
     @PostMapping("/saque")
     public ResponseEntity<Transacao> sacar(
             @RequestParam String numeroConta,
