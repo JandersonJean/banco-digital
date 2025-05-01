@@ -5,6 +5,7 @@ import com.example.banco_digital.model.Conta;
 import com.example.banco_digital.model.Transacao;
 import com.example.banco_digital.repository.ContaRepository;
 import com.example.banco_digital.repository.TransacaoRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +34,20 @@ public class TransacaoService {
         return transacaoRepository.save(transacao);
     }
 
-    // Implementar métodos para saque e transferência
+    @Transactional
+    public Transacao sacar(String numeroConta, String agencia, BigDecimal valor) {
+        Conta conta = contaRepository.findByNumeroContaAndAgencia(numeroConta, agencia)
+                .orElseThrow(() -> new ContaNaoEncontradaException("Conta não encontrada"));
+
+        conta.debitar(valor); // Lança SaldoInsuficienteException se necessário
+
+        Transacao transacao = new Transacao();
+        transacao.setConta(conta);
+        transacao.setValor(valor);
+        transacao.setTipo("SAQUE");
+        transacao.setDataHora(LocalDateTime.now());
+
+        contaRepository.save(conta);
+        return transacaoRepository.save(transacao);
+    }
 }
