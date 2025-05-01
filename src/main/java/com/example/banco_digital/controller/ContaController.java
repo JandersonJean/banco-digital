@@ -19,7 +19,7 @@ public class ContaController {
         return ResponseEntity.ok(contaService.criarConta(conta));
     }
 
-    @GetMapping("/{numeroConta}/{agencia}/saldo")
+    @GetMapping("/{numeroConta}/{agencia}")
     public ResponseEntity<BigDecimal> consultarSaldo(
             @PathVariable String numeroConta,
             @PathVariable String agencia) {
