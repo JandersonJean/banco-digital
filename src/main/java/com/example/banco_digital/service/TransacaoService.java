@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,35 @@ public class TransacaoService {
         transacao.setDataHora(LocalDateTime.now());
 
         contaRepository.save(conta);
+        return transacaoRepository.save(transacao);
+    }
+
+    @Transactional
+    public Transacao transferir(String contaOrigem, String agenciaOrigem,
+                                String contaDestino, String agenciaDestino,
+                                BigDecimal valor) {
+        // Busca contas
+        Conta origem = contaRepository.findByNumeroContaAndAgencia(contaOrigem, agenciaOrigem)
+                .orElseThrow(() -> new ContaNaoEncontradaException("Conta origem não encontrada"));
+
+        Conta destino = contaRepository.findByNumeroContaAndAgencia(contaDestino, agenciaDestino)
+                .orElseThrow(() -> new ContaNaoEncontradaException("Conta destino não encontrada"));
+
+        // Executa operações
+        origem.debitar(valor);
+        destino.creditar(valor);
+
+        // Cria transação de saída
+        Transacao transacao = new Transacao();
+        transacao.setConta(origem);
+        transacao.setValor(valor);
+        transacao.setTipo("TRANSFERENCIA");
+        transacao.setDataHora(LocalDateTime.now());
+        transacao.setContaDestino(contaDestino);
+        transacao.setAgenciaDestino(agenciaDestino);
+
+        // Salva alterações
+        contaRepository.saveAll(List.of(origem, destino));
         return transacaoRepository.save(transacao);
     }
 }
